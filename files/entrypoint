@@ -64,6 +64,18 @@ if [ ! -f "$userConfFinalPath" ]; then
         exit 3
     fi
 
+    #privilege sub directory
+    IFS=':' read -ra args <<< "$user"
+    username=${args[0]}
+    echo "$username"
+    
+    for sub_dir in /home/$username/* ; do
+        if [ -d "$sub_dir" ]; then
+            echo "${sub_dir}/"
+            chown -R $username $sub_dir
+        fi
+    done
+
     # Generate unique ssh keys for this container, if needed
     if [ ! -f /etc/ssh/ssh_host_ed25519_key ]; then
         ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ''
