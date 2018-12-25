@@ -65,16 +65,16 @@ if [ ! -f "$userConfFinalPath" ]; then
     fi
 
     #privilege sub directory
-    IFS=':' read -ra args <<< "$user"
-    username=${args[0]}
-    echo "$username"
+    # IFS=':' read -ra args <<< "$user"
+    # username=${args[0]}
+    # echo "$username"
     
-    for sub_dir in /home/$username/* ; do
-        if [ -d "$sub_dir" ]; then
-            echo "${sub_dir}/"
-            chown -R $username $sub_dir
-        fi
-    done
+    # for sub_dir in /home/$username/* ; do
+    #     if [ -d "$sub_dir" ]; then
+    #         echo "${sub_dir}/"
+    #         chown -R $username $sub_dir
+    #     fi
+    # done
 
     # Generate unique ssh keys for this container, if needed
     if [ ! -f /etc/ssh/ssh_host_ed25519_key ]; then
@@ -84,6 +84,20 @@ if [ ! -f "$userConfFinalPath" ]; then
         ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key -N ''
     fi
 fi
+
+for user_home in /home/* ; do
+  if [ -d "$user_home" ]; then
+    username=`basename $user_home`
+    echo "Setup $user_home/share folder for $username"
+
+    for sub_dir in /home/$username/* ; do
+        if [ -d "$sub_dir" ]; then
+            echo "${sub_dir}/"
+            chown -R $username $sub_dir
+        fi
+    done
+  fi
+done
 
 # Source custom scripts, if any
 if [ -d /etc/sftp.d ]; then
